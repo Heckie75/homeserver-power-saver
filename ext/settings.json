@@ -1,0 +1,253 @@
+{
+    "dryrun": false,
+    "mode": "mem",
+    "dbus": true,
+    "respite_prepare": 10,
+    "respite_recover": 10,
+    "min_uptime": 10,
+    "min_downtime": 10,
+    "checkers": {
+        "PowerSaverInterruptionChecker": {
+            "enable": true,
+            "uptimes": [
+                {
+                    "days": [
+                    ],
+                    "from": "6:45",
+                    "until": "7:35"
+                }
+            ],
+            "preaction": true,
+            "preactions": [
+                [
+                    "systemctl",
+                    "stop",
+                    "tvheadend.service"
+                ],
+                [
+                    "sudo",
+                    "-u",
+                    "heckie",
+                    "VBoxManage",
+                    "controlvm",
+                    "Windows 10 pro",
+                    "pause"
+                ],
+                [
+                    "sudo",
+                    "-u",
+                    "heckie",
+                    "/opt/signal-cli/bin/signal-cli",
+                    "-c",
+                    "/home/heckie/.local/share/signal-cli",
+                    "send",
+                    "-m",
+                    "heckies-nuc ruht sich bis $[wakeup] aus.",
+                    "--note-to-self"
+                ]
+            ],
+            "postaction": true,
+            "postactions": [
+                [
+                    "/home/heckie/bin/usbbind.py",
+                    "--rebind",
+                    "2040:0265"
+                ],
+                [
+                    "/home/heckie/bin/rc.local"
+                ],
+                [
+                    "systemctl",
+                    "start",
+                    "tvheadend.service"
+                ],
+                [
+                    "sudo",
+                    "-u",
+                    "heckie",
+                    "VBoxManage",
+                    "controlvm",
+                    "Windows 10 pro",
+                    "resume"
+                ],
+                [
+                    "sudo",
+                    "-u",
+                    "heckie",
+                    "/opt/signal-cli/bin/signal-cli",
+                    "-c",
+                    "/home/heckie/.local/share/signal-cli",
+                    "send",
+                    "-m",
+                    "heckies-nuc ist aufgewacht.",
+                    "--note-to-self"
+                ]
+            ]
+        },
+        "XIdleInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        6
+                    ],
+                    "from": "23:00",
+                    "until": "6:45"
+                }
+            ],
+            "min_idle": 10,
+            "users": [
+                "heckie"
+            ]
+        },
+        "WhoInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        6
+                    ],
+                    "from": "23:00",
+                    "until": "6:45"
+                }
+            ],
+            "ignore_lines": [
+                "tty7"
+            ]
+        },
+        "ProcessInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 2,
+            "processes": [
+                "tar",
+                "gzip",
+                "zip",
+                "unzip",
+                "7z",
+                "cp",
+                "scp",
+                "rsync",
+                "apt",
+                "clamscan",
+                "brasero",
+                "genisoimage",
+                "wodim",
+                "VBoxManage"
+            ]
+        },
+        "KodiInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        6
+                    ],
+                    "from": "23:00",
+                    "until": "6:45"
+                }
+            ],
+            "preaction": true,
+            "host": "192.168.178.30",
+            "port": 9080,
+            "user": "kodi",
+            "password": "kodi"
+        },
+        "KodiTimersInterruptionChecker": {
+            "enable": true,
+            "extra_wakeup_time": 1,
+            "ignore_periods": [],
+            "path": "/home/heckie/.kodi",
+            "postaction": true,
+            "host": "192.168.178.30",
+            "port": 9080,
+            "user": "kodi",
+            "password": "kodi"
+        },
+        "TvHeadendInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "extra_wakeup_time": 7,
+            "host": "192.168.178.30",
+            "port": 9981,
+            "user": "tvheadenduser",
+            "password": "tvheadenduser"
+        },
+        "TvHeadendEpgGrabberInterruptionChecker": {
+            "enable": true,
+            "epg_config_path": "/home/hts/.hts/tvheadend/epggrab/config",
+            "extra_wakeup_time": 2
+        },
+        "PulseAudioSinkInputInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 3,
+            "users": [
+                "heckie"
+            ]
+        },
+        "SambaInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10
+        },
+        "CupsInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 3
+        },
+        "CronInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "extra_wakeup_time": 1,
+            "users": [
+                "heckie",
+                "root"
+            ],
+            "tabfiles": [],
+            "ignore_frequency": {
+                "max_per_year": 365
+            }
+        },
+        "LoadInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 3,
+            "threshold": 0.95
+        },
+        "PingInterruptionChecker": {
+            "enable": false,
+            "stay_awake": 3,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "from": "21:15",
+                    "until": "6:45"
+                }
+            ],
+            "ip": [
+                "192.168.178.31"
+            ]
+        }
+    },
+    "log": "DEBUG",
+    "logfile": "/var/log/powersaver.log"
+}
