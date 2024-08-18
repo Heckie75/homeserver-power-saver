@@ -282,7 +282,7 @@ Let's go through this file:
                 "max_per_hour" : 59       // ignore cron jobs that are executed every minute
             },
         },
-        "LoadInteruptionChecker": {       // Checker that checks if system has a high CPU utilization at this moment indicating that something important is going on that mustn't be interupted
+        "LoadInteruptionChecker": {       // Checker that checks avg. CPU utilization of last 5 minutes indicating that something important is going on that mustn't be interupted
             "enable": true,
             "stay_awake": 5,             // If there is high CPU utilization wait another 5 minutes before it retries to suspend system
             "threshold": 0.95            // level of avg. CPU utilization in last 5 minutes. If CPU utilization is higher system won't suspend, see also command 'top'
@@ -609,7 +609,7 @@ This checker is also able to determine if there are scheduled cron jobs in an up
             ],
             "ignore_frequency" : {        // ignore cron jobs that are scheduled very often. You can combine "max_per_year", "max_days_per_year", "max_per_day" or "max_per_hour" or leave them out if not required.
                 "max_per_year" : 8760,    // ignore cron jobs that are executed more than 8760 times a year, i.e. more than once an hour on every day
-                "max_days_per_year" : 12, // ignore cron jobs that are executed more than 12 days a year
+                "max_days_per_year" : 366,// ignore cron jobs that are executed more than 366 days a year (366 since also take care of leap year!)
                 "max_per_day" : 24,       // ignore cron jobs that are executed more than once an hour
                 "max_per_hour" : 59       // ignore cron jobs that are executed every minute
             }

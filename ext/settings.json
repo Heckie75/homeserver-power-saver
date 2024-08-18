@@ -11,19 +11,13 @@
             "enable": true,
             "uptimes": [
                 {
-                    "days": [
-                    ],
+                    "days": [],
                     "from": "6:45",
                     "until": "7:35"
                 }
             ],
             "preaction": true,
             "preactions": [
-                [
-                    "systemctl",
-                    "stop",
-                    "tvheadend.service"
-                ],
                 [
                     "sudo",
                     "-u",
@@ -49,17 +43,7 @@
             "postaction": true,
             "postactions": [
                 [
-                    "/home/heckie/bin/usbbind.py",
-                    "--rebind",
-                    "2040:0265"
-                ],
-                [
                     "/home/heckie/bin/rc.local"
-                ],
-                [
-                    "systemctl",
-                    "start",
-                    "tvheadend.service"
                 ],
                 [
                     "sudo",
@@ -142,6 +126,7 @@
                 "brasero",
                 "genisoimage",
                 "wodim",
+                "rec",
                 "VBoxManage"
             ]
         },
@@ -217,16 +202,16 @@
             ],
             "tabfiles": [],
             "ignore_frequency": {
-                "max_per_year": 365
+                "max_per_year": 366
             }
         },
         "LoadInterruptionChecker": {
             "enable": true,
             "stay_awake": 3,
-            "threshold": 0.95
+            "threshold": 0.6
         },
         "PingInterruptionChecker": {
-            "enable": false,
+            "enable": true,
             "stay_awake": 3,
             "ignore_periods": [
                 {
@@ -239,8 +224,8 @@
                         5,
                         6
                     ],
-                    "from": "21:15",
-                    "until": "6:45"
+                    "from": "23:00",
+                    "until": "6:30"
                 }
             ],
             "ip": [
@@ -248,6 +233,6 @@
             ]
         }
     },
-    "log": "DEBUG",
+    "log": "INFO",
     "logfile": "/var/log/powersaver.log"
 }

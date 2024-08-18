@@ -53,6 +53,7 @@ class KodiTimersInterruptionChecker(AbstractInterruptionChecker):
     MEDIA_ACTION_STOP_START = 4
 
     TIMER_WEEKLY = 7
+    TIMER_BY_DATE = 8
 
     TIMERS_PATH = "userdata/addon_data/script.timers/timers.json"
     SETTINGS_PATH = "userdata/addon_data/script.timers/settings.xml"
@@ -164,17 +165,22 @@ class KodiTimersInterruptionChecker(AbstractInterruptionChecker):
                 if d == self.TIMER_WEEKLY:
                     continue
 
-                _hh_mm = _ts.split(":")
-                td_media_action = timedelta(days=(d + _next_day) %
-                                            7, hours=int(_hh_mm[0]), minutes=int(_hh_mm[1]), seconds=_offset)
+                elif d == self.TIMER_BY_DATE:
+                    actions.append(datetime.strptime("%s %s" %
+                                   (t["date"], _ts), "%Y-%m-%d %H:%M"))
 
-                if td_media_action < td_now:
-                    if self.TIMER_WEEKLY in t["days"]:
-                        td_media_action += timedelta(days=7)
-                    else:
-                        continue
+                else:
+                    _hh_mm = _ts.split(":")
+                    td_media_action = timedelta(days=(d + _next_day) %
+                                                7, hours=int(_hh_mm[0]), minutes=int(_hh_mm[1]), seconds=_offset)
 
-                actions.append(apply_for_now(dt_now, td_media_action))
+                    if td_media_action < td_now:
+                        if self.TIMER_WEEKLY in t["days"]:
+                            td_media_action += timedelta(days=7)
+                        else:
+                            continue
+
+                    actions.append(apply_for_now(dt_now, td_media_action))
 
         return actions
 

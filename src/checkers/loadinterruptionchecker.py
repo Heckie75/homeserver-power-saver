@@ -22,9 +22,9 @@ class LoadInterruptionChecker(AbstractInterruptionChecker):
         out = subprocess.getoutput("LANG=en uptime")
         m = re.match(self.UPTIME_PATTERN, out)
         if m:
-            load = float(m.groups()[0])
+            load = float(m.groups()[1])
             if load >= self.setting["threshold"]:
-                LOGGER.debug("Current load %.2f is higher than threshold %.2f." % (load, self.setting["threshold"]))
+                LOGGER.debug("Avg. 5-minutes-load %.2f is higher than threshold %.2f." % (load, self.setting["threshold"]))
 
                 return self.stay_awake
 
