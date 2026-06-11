@@ -39,61 +39,61 @@ class TestPeriods(unittest.TestCase):
             periods.add(p)
 
         x0 = datetime(year=2022, month=12, day=5, hour=6)
-        self.assertEquals(str(p1.apply_for_this_week(x0)),
+        self.assertEqual(str(p1.apply_for_this_week(x0)),
                           "2022-12-04 16:00:00 -> 2022-12-05 08:00:00")
 
         x1 = datetime(year=2022, month=12, day=5, hour=12)
-        self.assertEquals(str(p2.apply_for_this_week(x1)),
+        self.assertEqual(str(p2.apply_for_this_week(x1)),
                           "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
 
         x2 = datetime(year=2022, month=12, day=5, hour=22)
-        self.assertEquals(str(p2.apply_for_this_week(x2)),
+        self.assertEqual(str(p2.apply_for_this_week(x2)),
                           "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
 
         x3 = datetime(year=2022, month=12, day=6, hour=4)
-        self.assertEquals(str(p2.apply_for_this_week(x3)),
+        self.assertEqual(str(p2.apply_for_this_week(x3)),
                           "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
 
         x4 = datetime(year=2022, month=12, day=6, hour=16)
-        self.assertEquals(str(p3.apply_for_this_week(x4)),
+        self.assertEqual(str(p3.apply_for_this_week(x4)),
                           "2022-12-07 00:00:00 -> 2022-12-07 08:00:00")
 
         x5 = datetime(year=2022, month=12, day=7, hour=4)
-        self.assertEquals(str(p3.apply_for_this_week(x5)),
+        self.assertEqual(str(p3.apply_for_this_week(x5)),
                           "2022-12-07 00:00:00 -> 2022-12-07 08:00:00")
 
         x6 = datetime(year=2022, month=12, day=7, hour=12)
-        self.assertEquals(str(p4.apply_for_this_week(x6)),
+        self.assertEqual(str(p4.apply_for_this_week(x6)),
                           "2022-12-07 16:00:00 -> 2022-12-08 00:00:00")
 
         x7 = datetime(year=2022, month=12, day=7, hour=22)
-        self.assertEquals(str(p4.apply_for_this_week(x7)),
+        self.assertEqual(str(p4.apply_for_this_week(x7)),
                           "2022-12-07 16:00:00 -> 2022-12-08 00:00:00")
 
         x8 = datetime(year=2022, month=12, day=8, hour=4)
-        self.assertEquals(str(p5.apply_for_this_week(x8)),
+        self.assertEqual(str(p5.apply_for_this_week(x8)),
                           "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
 
         x9 = datetime(year=2022, month=12, day=8, hour=16)
-        self.assertEquals(str(p5.apply_for_this_week(x9)),
+        self.assertEqual(str(p5.apply_for_this_week(x9)),
                           "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
 
         x10 = datetime(year=2022, month=12, day=9, hour=8)
-        self.assertEquals(str(p5.apply_for_this_week(x10)),
+        self.assertEqual(str(p5.apply_for_this_week(x10)),
                           "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
 
         x11 = datetime(year=2022, month=12, day=10, hour=4)
-        self.assertEquals(str(p5.apply_for_this_week(x11)),
+        self.assertEqual(str(p5.apply_for_this_week(x11)),
                           "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
 
         x12 = datetime(year=2022, month=12, day=10, hour=16)
-        self.assertEquals(str(p1.apply_for_this_week(x12)),
+        self.assertEqual(str(p1.apply_for_this_week(x12)),
                           "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")
 
         x13 = datetime(year=2022, month=12, day=11, hour=8)
-        self.assertEquals(str(p1.apply_for_this_week(x13)),
+        self.assertEqual(str(p1.apply_for_this_week(x13)),
                           "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")
 
         x14 = datetime(year=2022, month=12, day=11, hour=20)
-        self.assertEquals(str(p1.apply_for_this_week(x14)),
+        self.assertEqual(str(p1.apply_for_this_week(x14)),
                           "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")

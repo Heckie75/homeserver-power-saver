@@ -22,7 +22,7 @@ class TestWhoInteruptionsChecker(unittest.TestCase):
         whointeruption = WhoInterruptionChecker(setting=setting)
 
         busy = whointeruption._get_occupation(datetime.today())
-        self.assertEquals(busy, timedelta(minutes=5))
+        self.assertEqual(busy, timedelta(minutes=5))
 
     def test_whointeruption_checker_check_not_busy(self):
 

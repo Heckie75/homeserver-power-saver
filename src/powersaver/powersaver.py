@@ -125,7 +125,7 @@ class PowerSaver():
             if _busy is not None:
                 LOGGER.info("%s: Request to keep device up for %i minutes." % (
                     c.__class__.__name__, _busy.total_seconds() // 60))
-                busy = _busy if busy < _busy else busy
+                busy = max(_busy, busy)
 
         # If PC is busy then don't enter rest period
         if busy:
@@ -156,8 +156,11 @@ class PowerSaver():
             LOGGER.debug("Main loop for checker started.")
             while True:
 
-                time.sleep(60 - int(time.time() % 60))
                 dt_now = datetime.today()
+                if not dt_busy_until or dt_busy_until < dt_now: 
+                    time.sleep(60 - int(time.time() % 60))
+                else:
+                    time.sleep((dt_busy_until - dt_now).total_seconds())
 
                 _busy = self._get_occupation(dt_now)
                 if _busy and (not dt_busy_until or dt_busy_until < _busy):
