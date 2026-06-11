@@ -6,6 +6,7 @@ The service turns off your PC according to a set of periods that has been config
 * if there are locked files on samba shares
 * if there are running print jobs (cups)
 * if [Kodi](https://kodi.tv/) media center plays media at this moment
+* if the [Kodi WIZ](https://github.com/Heckie75/kodi-addon-wiz) addon has scheduled programs that should keep the PC awake
 * if [TvHeadend](https://tvheadend.org/) has active streams 
 
 In case that there is a scheduled [TvHeadend](https://tvheadend.org/) recording during a rest period the service automatically turns on your PC in time so that recordings won't be missed. This is also for scheduled cronjobs that are in your crontabs and scheduled media in [Kodi](https://kodi.tv/) by utilizing the addon [Timers](https://kodi.tv/addons/matrix/script.timers)).
@@ -230,6 +231,17 @@ Let's go through this file:
             "extra_wakeup_time": 2,        // In case of scheduled media system will be started 2 minutes earlier
             "path": "/home/heckie/.kodi",  // path to Kodi's configuration folder
             "postaction": true,            // perform postaction, i.e. set default volume in Kodi according value in settings of timers addon
+            "host": "192.168.178.30",      // IP address of Kodi's web server. Note that webserver must be activated in Kodi
+            "port": 9080,                  // Port of Kodi's web server
+            "user": "kodi",                // User for web interface
+            "password": "kodi"             // Password of user
+        },
+        "KodiWizInteruptionChecker": {     // Checker for Kodi's WIZ addon
+            "enable": true,                // [true,false] if true then checker is activated
+            "stay_awake": 10,              // If WIZ has scheduled programs at this moment service will wait another 10 minutes before it retries to suspend system
+            "path": "/home/heckie/.kodi/userdata/addon_data/script.wiz/running_programs.json", // path to the WIZ running programs file
+            "preaction": true,             // execute preaction before suspend to stop the currently active WIZ program
+            "postaction": true,            // execute postaction after wake-up to resume the WIZ program
             "host": "192.168.178.30",      // IP address of Kodi's web server. Note that webserver must be activated in Kodi
             "port": 9080,                  // Port of Kodi's web server
             "user": "kodi",                // User for web interface
@@ -512,6 +524,24 @@ In case that you use the kodi addon [Timers](https://kodi.tv/addons/matrix/scrip
             "extra_wakeup_time": 2,        // In case of scheduled media system will be started 2 minutes earlier
             "path": "/home/heckie/.kodi",  // path to Kodi's configuration folder
             "postaction": true,            // perform postaction, i.e. set default volume in Kodi according value in settings of timers addon
+            "host": "192.168.178.30",      // IP address of Kodi's web server. Note that webserver must be activated in Kodi
+            "port": 9080,                  // Port of Kodi's web server
+            "user": "kodi",                // User for web interface
+            "password": "kodi"             // Password of user
+        },
+```
+
+### KodiWizInteruptionChecker - Check if Kodi WIZ has scheduled programs
+
+If you use the Kodi WIZ addon, this checker can keep the machine awake when a program is running.
+
+```json
+        "KodiWizInteruptionChecker": {     // Checker for Kodi's WIZ addon
+            "enable": true,                // [true,false] if true then checker is activated
+            "stay_awake": 10,              // If WIZ has scheduled programs at this moment service will wait another 10 minutes before it retries to suspend system
+            "path": "/home/heckie/.kodi/userdata/addon_data/script.wiz/running_programs.json", // path to the WIZ running programs file
+            "preaction": true,             // execute preaction before suspend to stop the currently active WIZ program
+            "postaction": true,            // execute postaction after wake-up to resume the WIZ program
             "host": "192.168.178.30",      // IP address of Kodi's web server. Note that webserver must be activated in Kodi
             "port": 9080,                  // Port of Kodi's web server
             "user": "kodi",                // User for web interface

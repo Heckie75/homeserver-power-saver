@@ -10,7 +10,7 @@ class TestTvHeadendInteruptionChecker(unittest.TestCase):
 
         setting = {
             "enable": True,
-            "host": "192.168.178.30",
+            "host": "192.168.178.20",
             "port": 9981,
             "user": "tvheadenduser",
             "password": "tvheadenduser",

@@ -3,46 +3,12 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta
+from utils.kodijsonrpcclient import KodiJsonRpcClient
 
-import requests
 
 from checkers.abstractinterruptionchecker import AbstractInterruptionChecker
 
 LOGGER = logging.getLogger()
-
-
-class KodiJsonRpcClient():
-
-    def __init__(self, host, port, user, password) -> None:
-
-        self._host = host
-        self._port = port
-        self._user = user
-        self._password = password
-
-    def _request(self, payload) -> 'dict':
-
-        try:
-            response = requests.request("POST", "http://%s:%i/jsonrpc" % (
-                self._host, self._port), auth=(self._user, self._password) if self._user and self._password else None, data=json.dumps(payload))
-
-            if response.ok:
-                LOGGER.debug(response.text)
-                return json.loads(response.text)
-
-            else:
-                LOGGER.error(
-                    "Kodi has responded with HTTP status code %i" % response.status_code)
-                return None
-        except:
-            LOGGER.error("Unexpected error", exc_info=True)
-            return None
-
-    def set_volume(self, volume: int) -> None:
-
-        payload = [
-            {"jsonrpc": "2.0", "method": "Application.SetVolume", "id": 1, "params": {"volume": volume}}]
-        self._request(payload=payload)
 
 
 class KodiTimersInterruptionChecker(AbstractInterruptionChecker):
