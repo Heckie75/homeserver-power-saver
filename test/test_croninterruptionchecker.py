@@ -41,19 +41,19 @@ class TestCronInterruptionChecker(unittest.TestCase):
         dt_now = datetime(year=2022, month=12, day=22, hour=8, minute=25)
         croninteruptionchecker.get_occupation(dt_now)
         td = croninteruptionchecker.get_upcoming_event(dt_now)
-        self.assertEquals(td, datetime(2022, 12, 22, 10, 15))
+        self.assertEqual(td, datetime(2022, 12, 22, 10, 15))
 
         dt_now = datetime(year=2022, month=12, day=22, hour=10, minute=25)
         croninteruptionchecker.get_occupation(dt_now)
         td = croninteruptionchecker.get_upcoming_event(dt_now)
-        self.assertEquals(td, datetime(2022, 12, 22, 20, 0))
+        self.assertEqual(td, datetime(2022, 12, 22, 20, 0))
 
         dt_now = datetime(year=2022, month=12, day=22, hour=14, minute=27)
         croninteruptionchecker.get_occupation(dt_now)
         td = croninteruptionchecker.get_upcoming_event(dt_now)
-        self.assertEquals(td, datetime(2022, 12, 26, 1, 0))
+        self.assertEqual(td, datetime(2022, 12, 26, 1, 0))
 
         dt_now = datetime(year=2022, month=12, day=25, hour=23, minute=27)
         croninteruptionchecker.get_occupation(dt_now)
         td = croninteruptionchecker.get_upcoming_event(dt_now)
-        self.assertEquals(td, datetime(2022, 12, 26, 1, 0))
+        self.assertEqual(td, datetime(2022, 12, 26, 1, 0))

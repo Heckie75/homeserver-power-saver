@@ -42,22 +42,22 @@ class TestPeriods(unittest.TestCase):
         periods = p.periods
 
         for i in range(5):
-            self.assertEquals(periods[2 * i].start,
+            self.assertEqual(periods[2 * i].start,
                               timedelta(hours=8, minutes=15, days=i))
-            self.assertEquals(periods[2 * i].end,
+            self.assertEqual(periods[2 * i].end,
                               timedelta(hours=19, minutes=25, days=i))
-            self.assertEquals(periods[2 * i + 1].start,
+            self.assertEqual(periods[2 * i + 1].start,
                               timedelta(hours=22, minutes=15, days=i))
-            self.assertEquals(periods[2 * i + 1].end,
+            self.assertEqual(periods[2 * i + 1].end,
                               timedelta(hours=6, minutes=45, days=i + 1))
 
-        self.assertEquals(periods[10].start, timedelta(
+        self.assertEqual(periods[10].start, timedelta(
             hours=22, minutes=15, days=5))
-        self.assertEquals(periods[10].end, timedelta(
+        self.assertEqual(periods[10].end, timedelta(
             hours=6, minutes=45, days=6))
-        self.assertEquals(periods[11].start, timedelta(
+        self.assertEqual(periods[11].start, timedelta(
             hours=22, minutes=15, days=6))
-        self.assertEquals(periods[11].end, timedelta(
+        self.assertEqual(periods[11].end, timedelta(
             hours=6, minutes=45, days=0))
 
     def test_add(self):
@@ -66,8 +66,8 @@ class TestPeriods(unittest.TestCase):
         periods.add(Period(timedelta(days=1, hours=22),
                     timedelta(days=1, hours=23)))
 
-        self.assertEquals(len(periods.periods), 1)
-        self.assertEquals(periods.periods[
+        self.assertEqual(len(periods.periods), 1)
+        self.assertEqual(periods.periods[
                           0].start, timedelta(days=1, hours=22))
 
     def test_unify_1(self):
@@ -80,10 +80,10 @@ class TestPeriods(unittest.TestCase):
 
         periods.unify()
 
-        self.assertEquals(len(periods.periods), 1)
-        self.assertEquals(periods.periods[
+        self.assertEqual(len(periods.periods), 1)
+        self.assertEqual(periods.periods[
                           0].start, timedelta(days=0, hours=10))
-        self.assertEquals(periods.periods[
+        self.assertEqual(periods.periods[
                           0].end, timedelta(days=0, hours=13))
 
     def test_unify_2(self):
@@ -96,10 +96,10 @@ class TestPeriods(unittest.TestCase):
 
         periods.unify()
 
-        self.assertEquals(len(periods.periods), 1)
-        self.assertEquals(periods.periods[
+        self.assertEqual(len(periods.periods), 1)
+        self.assertEqual(periods.periods[
                           0].start, timedelta(days=6, hours=23))
-        self.assertEquals(periods.periods[
+        self.assertEqual(periods.periods[
                           0].end, timedelta(days=0, hours=3))
 
     def test_unify_3(self):
@@ -112,10 +112,10 @@ class TestPeriods(unittest.TestCase):
 
         periods.unify()
 
-        self.assertEquals(len(periods.periods), 1)
-        self.assertEquals(periods.periods[
+        self.assertEqual(len(periods.periods), 1)
+        self.assertEqual(periods.periods[
                           0].start, timedelta(days=6, hours=21))
-        self.assertEquals(periods.periods[
+        self.assertEqual(periods.periods[
                           0].end, timedelta(days=0, hours=3))
 
     def test_get_next_period_1(self):
@@ -151,90 +151,90 @@ class TestPeriods(unittest.TestCase):
 
         x0 = datetime(year=2022, month=12, day=5, hour=6)
         running, period = periods.get_next_period(x0)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-04 16:00:00 -> 2022-12-05 08:00:00")
         self.assertTrue(running)
 
         x1 = datetime(year=2022, month=12, day=5, hour=12)
         running, period = periods.get_next_period(x1)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
         self.assertFalse(running)
 
         x2 = datetime(year=2022, month=12, day=5, hour=22)
         running, period = periods.get_next_period(x2)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
         self.assertTrue(running)
 
         x3 = datetime(year=2022, month=12, day=6, hour=4)
         running, period = periods.get_next_period(x3)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-05 16:00:00 -> 2022-12-06 08:00:00")
         self.assertTrue(running)
 
         x4 = datetime(year=2022, month=12, day=6, hour=16)
         running, period = periods.get_next_period(x4)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-07 00:00:00 -> 2022-12-07 08:00:00")
         self.assertFalse(running)
 
         x5 = datetime(year=2022, month=12, day=7, hour=4)
         running, period = periods.get_next_period(x5)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-07 00:00:00 -> 2022-12-07 08:00:00")
         self.assertTrue(running)
 
         x6 = datetime(year=2022, month=12, day=7, hour=12)
         running, period = periods.get_next_period(x6)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-07 16:00:00 -> 2022-12-08 00:00:00")
         self.assertFalse(running)
 
         x7 = datetime(year=2022, month=12, day=7, hour=22)
         running, period = periods.get_next_period(x7)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-07 16:00:00 -> 2022-12-08 00:00:00")
         self.assertTrue(running)
 
         x8 = datetime(year=2022, month=12, day=8, hour=4)
         running, period = periods.get_next_period(x8)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
         self.assertFalse(running)
 
         x9 = datetime(year=2022, month=12, day=8, hour=16)
         running, period = periods.get_next_period(x9)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
         self.assertTrue(running)
 
         x10 = datetime(year=2022, month=12, day=9, hour=8)
         running, period = periods.get_next_period(x10)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
         self.assertTrue(running)
 
         x11 = datetime(year=2022, month=12, day=10, hour=4)
         running, period = periods.get_next_period(x11)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-08 08:00:00 -> 2022-12-10 08:00:00")
         self.assertTrue(running)
 
         x12 = datetime(year=2022, month=12, day=10, hour=16)
         running, period = periods.get_next_period(x12)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")
         self.assertFalse(running)
 
         x13 = datetime(year=2022, month=12, day=11, hour=8)
         running, period = periods.get_next_period(x13)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")
         self.assertFalse(running)
 
         x14 = datetime(year=2022, month=12, day=11, hour=20)
         running, period = periods.get_next_period(x14)
-        self.assertEquals(
+        self.assertEqual(
             str(period), "2022-12-11 16:00:00 -> 2022-12-12 08:00:00")
         self.assertTrue(running)

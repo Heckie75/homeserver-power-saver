@@ -24,7 +24,7 @@ class TestPingInteruptionsChecker(unittest.TestCase):
 
         dt_now = datetime.today()
         busy = pinginteruption._get_occupation(dt_now)
-        self.assertEquals(busy, timedelta(minutes=20))
+        self.assertEqual(busy, timedelta(minutes=20))
 
     def test_pinginteruption_checker_check_not_busy(self):
 
