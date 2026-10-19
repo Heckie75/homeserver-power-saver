@@ -6,8 +6,11 @@ from checkers.abstractinterruptionchecker import AbstractInterruptionChecker
 
 try:
     import croniter
-except ImportError:
-    pass
+except ImportError as error:
+    croniter = None
+    CRONITER_IMPORT_ERROR = error
+else:
+    CRONITER_IMPORT_ERROR = None
 
 LOGGER = logging.getLogger()
 
@@ -24,15 +27,19 @@ class TvHeadendEpgGrabberInterruptionChecker(AbstractInterruptionChecker):
 
     def get_upcoming_event(self, dt_now: datetime) -> datetime:
 
+        if croniter is None:
+            raise RuntimeError("croniter is not installed") from CRONITER_IMPORT_ERROR
+
         def _parse_cron(s: str) -> 'list[croniter.croniter]':
 
             _iters = list()
             for l in s.split("\n"):
-                if not l.startswith("#"):
+                if l.strip() and not l.startswith("#"):
                     try:
                         _iters.append(croniter.croniter(l, dt_now))
-                    except:
-                        pass
+                    except (ValueError, TypeError) as error:
+                        raise ValueError(
+                            "Invalid EPG grabber cron expression %r: %s" % (l, error)) from error
 
             return _iters
 

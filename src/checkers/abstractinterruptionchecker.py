@@ -1,8 +1,8 @@
+import logging
 from datetime import datetime, timedelta
 
 from utils.periods import Periods
 
-import logging
 LOGGER = logging.getLogger()
 
 
@@ -24,18 +24,17 @@ class AbstractInterruptionChecker():
 
     def _get_occupation(self, dt_now: datetime) -> timedelta:
 
-        _running, _period = self.ignore_periods.get_next_period(dt_now)
-        if _running:
-            LOGGER.info("%s: Skip since check is in ignored period." %
-                        self.__class__.__name__)
-            return None
-
         try:
+            _running, _period = self.ignore_periods.get_next_period(dt_now)
+            if _running:
+                LOGGER.info("%s: Skip since check is in ignored period." %
+                            self.__class__.__name__)
+                return None
+
             return self.get_occupation(dt_now)
 
-        except:
-            LOGGER.error("%s: check_occupation" %
-                         self.__class__.__name__, exc_info=True)
+        except Exception as error:
+            self._log_checker_failure("check_occupation", error)
             return None
 
     def get_occupation(self, dt_now: datetime) -> timedelta:
@@ -51,10 +50,15 @@ class AbstractInterruptionChecker():
             else:
                 return None
 
-        except:
-            LOGGER.error("%s: get_upcoming_event" %
-                         self.__class__.__name__, exc_info=True)
+        except Exception as error:
+            self._log_checker_failure("get_upcoming_event", error)
             return None
+
+    def _log_checker_failure(self, operation: str, error: Exception) -> None:
+
+        LOGGER.warning("%s: %s failed: %s",
+                       self.__class__.__name__, operation,
+                       " ".join(str(error).splitlines()))
 
     def get_upcoming_event(self, dt_now: datetime) -> datetime:
 
@@ -63,12 +67,18 @@ class AbstractInterruptionChecker():
     def _perform_pre_action(self, dt_wakeup: datetime) -> None:
 
         if self.pre_action:
-            self.perform_pre_action(dt_wakeup)
+            try:
+                self.perform_pre_action(dt_wakeup)
+            except Exception as error:
+                self._log_checker_failure("perform_pre_action", error)
 
     def _perform_post_action(self) -> None:
 
         if self.post_action:
-            self.perform_post_action()
+            try:
+                self.perform_post_action()
+            except Exception as error:
+                self._log_checker_failure("perform_post_action", error)
 
     def perform_pre_action(self, dt_wakeup: datetime) -> None:
 

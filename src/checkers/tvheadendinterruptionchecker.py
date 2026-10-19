@@ -24,17 +24,19 @@ class TvHeadendHttpClient():
 
         try:
             response = requests.request("POST", "http://%s:%i/api/%s" % (
-                self._host, self._port, request), auth=HTTPDigestAuth(self._user, self._password) if self._user and self._password else None)
+                self._host, self._port, request), auth=HTTPDigestAuth(self._user, self._password) if self._user and self._password else None, timeout=5)
 
-            if response.ok:
+            response.raise_for_status()
+            try:
                 return json.loads(response.text)
-
-            else:
-                LOGGER.error("TVHeadend has responded with HTTP status code %i" % response.status_code)
-                return None
-        except:
-            LOGGER.error("Unexpected error", exc_info=True)
-            return None
+            except ValueError as error:
+                raise RuntimeError(
+                    "Invalid JSON from TvHeadend at %s:%i for %s: %s"
+                    % (self._host, self._port, request, error)) from error
+        except requests.exceptions.RequestException as error:
+            raise RuntimeError(
+                "TvHeadend request to %s:%i for %s failed: %s"
+                % (self._host, self._port, request, error)) from error
 
     def get_subscriptions(self) -> None:
 

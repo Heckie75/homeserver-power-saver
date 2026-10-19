@@ -191,6 +191,10 @@ class PowerSaver():
             LOGGER.info(
                 "homeserver-power-saver interrupted by KeyboardInterrupt or SystemExit")
 
+        except (OSError, subprocess.CalledProcessError) as ex:
+            LOGGER.error("homeserver-power-saver operation failed: %s",
+                         " ".join(str(ex).splitlines()))
+
         except Exception as ex:
             LOGGER.error("%s: %s" % (type(ex), ex), exc_info=True)
 

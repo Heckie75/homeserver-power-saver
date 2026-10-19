@@ -18,29 +18,11 @@
             ],
             "preaction": true,
             "preactions": [
-                [
-                    "sudo",
-                    "-u",
-                    "heckie",
-                    "VBoxManage",
-                    "controlvm",
-                    "Windows 10 pro",
-                    "pause"
-                ]
             ],
             "postaction": true,
             "postactions": [
                 [
                     "/home/heckie/bin/rc.local"
-                ],
-                [
-                    "sudo",
-                    "-u",
-                    "heckie",
-                    "VBoxManage",
-                    "controlvm",
-                    "Windows 10 pro",
-                    "resume"
                 ],
                 [
                     "systemctl",
@@ -50,7 +32,7 @@
             ]
         },
         "XIdleInterruptionChecker": {
-            "enable": true,
+            "enable": false,
             "stay_awake": 5,
             "ignore_periods": [
                 {
@@ -70,6 +52,45 @@
                 "heckie"
             ]
         },
+        "WaylandInterruptionChecker": {
+            "enable": false,
+            "stay_awake": 5,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        6
+                    ],
+                    "from": "23:30",
+                    "until": "6:00"
+                }
+            ],
+            "min_idle": 10,
+            "users": [
+                "heckie"
+            ]
+        },
+        "GnomeMutterIdleInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 20,
+            "ignore_periods": [
+                {
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        6
+                    ],
+                    "from": "23:30",
+                    "until": "6:00"
+                }
+            ],
+            "ignore": "\\b(?:gdm-greeter|example)\\b"
+        },
         "WhoInterruptionChecker": {
             "enable": true,
             "stay_awake": 5,
@@ -86,9 +107,7 @@
                     "until": "6:00"
                 }
             ],
-            "ignore_lines": [
-                "tty7"
-            ]
+            "ignore": "\\b(?:gdm-session-worker|tty2)\\b"
         },
         "ProcessInterruptionChecker": {
             "enable": true,
@@ -162,8 +181,8 @@
                         5,
                         6
                     ],
-                    "from": "0:00",
-                    "until": "24:00"
+                    "from": "23:00",
+                    "until": "4:00"
                 }
             ],
             "path": "/home/heckie/.kodi/userdata/addon_data/script.wiz/running_programs.json",

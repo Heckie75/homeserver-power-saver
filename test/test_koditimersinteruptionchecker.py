@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 from checkers.koditimersinterruptionchecker import \
     KodiTimersInterruptionChecker
@@ -123,4 +124,32 @@ class TestKodiTimersInteruptionChecker(unittest.TestCase):
         }
 
         kodiinteruptionchecker = MockedKodiTimersInterruptionChecker(setting)
-        kodiinteruptionchecker._perform_post_action()
+        with patch.object(kodiinteruptionchecker._kodiJsonRpcClient, "set_volume") as set_volume:
+            kodiinteruptionchecker._perform_post_action()
+
+        set_volume.assert_called_once_with(100)
+
+    def test_set_volume_failure_is_logged(self):
+
+        setting = {
+            "enable": True,
+            "path": "/home/heckie/.kodi",
+            "extra_wakeup_time": 3,
+            "postaction": True,
+            "host": "192.168.178.30",
+            "port": 9080,
+            "user": "kodi",
+            "password": "kodi",
+        }
+
+        checker = MockedKodiTimersInterruptionChecker(setting)
+        with patch.object(
+                checker._kodiJsonRpcClient,
+                "set_volume",
+                side_effect=RuntimeError("Kodi is unavailable")), \
+                self.assertLogs(level="WARNING") as logs:
+            checker._perform_post_action()
+
+        self.assertEqual(len(logs.output), 1)
+        self.assertIn("set_volume failed", logs.output[0])
+        self.assertIn("Kodi is unavailable", logs.output[0])

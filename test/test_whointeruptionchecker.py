@@ -1,46 +1,41 @@
 import unittest
 from datetime import datetime, timedelta
-from sys import platform
+from unittest.mock import patch
 
 from checkers.whointerruptionchecker import WhoInterruptionChecker
 
 
 class TestWhoInteruptionsChecker(unittest.TestCase):
 
-    def test_whointeruption_checker_check_busy(self):
+    @patch("checkers.whointerruptionchecker.subprocess.getoutput")
+    def test_unignored_line_means_busy(self, getoutput):
 
-        if not platform.startswith("linux"):
-
-            return
+        getoutput.return_value = "an output line without parsed terminal columns"
 
         setting = {
             "enable": True,
-            "ignore_lines": [],
+            "ignore": r"tty[0-9]+$",
             "stay_awake": 5
         }
 
-        whointeruption = WhoInterruptionChecker(setting=setting)
+        checker = WhoInterruptionChecker(setting=setting)
 
-        busy = whointeruption._get_occupation(datetime.today())
+        busy = checker.get_occupation(datetime.today())
         self.assertEqual(busy, timedelta(minutes=5))
 
-    def test_whointeruption_checker_check_not_busy(self):
+    @patch("checkers.whointerruptionchecker.subprocess.getoutput")
+    def test_lines_matching_ignore_regex_are_not_busy(self, getoutput):
 
-        if not platform.startswith("linux"):
+        getoutput.return_value = (
+            "heckie tty7 :0 session\n"
+            "heckie seat0 :0 session"
+        )
 
-            return
-
-        ignore = ["tty%i" % i for i in range(20)]
-        ignore.extend(["pts/%i" % i for i in range(20)])
-
-        setting = {
+        checker = WhoInterruptionChecker(setting={
             "enable": True,
-            "ignore_lines": ignore,
+            "ignore": r"\b(?:tty7|seat0)\b",
             "stay_awake": 5
-        }
+        })
 
-        whointeruption = WhoInterruptionChecker(setting=setting)
-
-        td_now = timedelta(days=0, hours=8)
-        busy = whointeruption._get_occupation(datetime.today())
+        busy = checker.get_occupation(datetime.today())
         self.assertIsNone(busy)

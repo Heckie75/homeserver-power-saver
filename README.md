@@ -10,6 +10,8 @@ The service turns off your PC according to a set of periods that has been config
 
 In case that there is a scheduled [TvHeadend](https://tvheadend.org/) recording during a rest period the service automatically turns on your PC in time so that recordings won't be missed. This is also for scheduled cronjobs that are in your crontabs and scheduled media in [Kodi](https://kodi.tv/) by utilizing the addon [Timers](https://kodi.tv/addons/matrix/script.timers)).
 
+If an enabled checker fails, the service logs a warning but doesn't prevent the server from suspending.
+
 ## Command
 ```
 usage: homeserver-power-saver.py [-h] [--daemon] [--stop] [--status] [--version] [--dry-run] s[--mode {mem,disk,off}] --settings SETTINGS [--log {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
@@ -64,7 +66,9 @@ $ ./homeserver-power-saver.py --stop
    1. The python library [_python-crontab_](https://pypi.org/project/python-crontab/) and [_croniter_](https://pypi.org/project/croniter/). You can install it like this ```pip install python-crontab``` and ```pip install croniter``` (Note that must be done with root user!)
    1. The _ping_ command which is provided in [net-tools](https://network-tools.com/). You can install it like this ```sudo apt install net-tools```
    1. The _who_ command which is POSIX standard.
-   1. The _xprintidle_ command which is available in Ubuntu. You can install it like this ```sudo apt install xidle```, see also [xprintidle](https://github.com/g0hl1n/xprintidle).
+   1. The _xprintidle_ command used by the X11-only XIdle checker, available in Ubuntu with ```sudo apt install xidle```, see also [xprintidle](https://github.com/g0hl1n/xprintidle).
+   1. The _loginctl_ command and _systemd-logind_ service for the Wayland activity checker.
+   1. The _gdbus_ and _runuser_ commands for the Gnome Mutter idle checker.
    1. The _pactl_ command which is available if you system uses pulse audio, see also [pacmd](https://manpages.ubuntu.com/manpages/bionic/man1/pacmd.1.html)
    1. The _smbstatus_ command which is available after you have installed your _samba_ server (e.g. ```apt install samba-common samba```), see also [smbstatus](https://www.samba.org/samba/docs/current/man-html/smbstatus.1.html).
    1. The _lpstat_ command which is available after you have installed _cups_, see also [lpstat](http://www.cups.org/doc/man-lpstat.html).
@@ -190,12 +194,18 @@ Let's go through this file:
                 "heckie"
             ]
         },
+        "WaylandInterruptionChecker": {
+            "enable": false,
+            "stay_awake": 10,
+            "min_idle": 30,
+            "users": [
+                "heckie"
+            ]
+        },
         "WhoInteruptionChecker": {         // Checker that checks if there are active terminals
             "enable": true,                // [true,false] if true then checker is activated
             "stay_awake": 10,              // If there are active terminals at this moment service will wait another 10 minutes before it retries to suspend system
-            "ignore_lines": [              // Some terminals/lines are always active, e.g. the line for the Gnome-Session. This will be ignored. Use the "w" command in order to find out the line for your system!
-                "tty7"
-            ]
+            "ignore": "\\btty7\\b"        // Regular expression tested against each output line from "w -h"; matching lines are ignored
         },
         "ProcessInteruptionChecker": {   // Checker that checks if there are processes running
             "enable": true,
@@ -318,6 +328,34 @@ Let's go through this file:
 ```
 
 ## Checkers
+### WaylandInterruptionChecker
+Use this checker instead of `XIdleInteruptionChecker` on Wayland desktops. It reads the active Wayland session's idle state from `systemd-logind` using `loginctl`; it does not try to monitor keyboard or pointer input directly. The desktop session must report its `IdleHint` to logind. Set `min_idle` in minutes, and list the desktop users to monitor. If logind cannot provide a reliable session state, the checker fails safe and keeps the server awake.
+
+```json
+        "WaylandInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 10,
+            "min_idle": 30,
+            "users": ["heckie"]
+        }
+```
+
+### GnomeMutterIdleInterruptionChecker - Check graphical user activity with Mutter
+
+This Linux-only checker queries GNOME Mutter's `IdleMonitor` over each graphical user's session bus. It discovers logged-in X11 and Wayland sessions with `loginctl` and checks all of their users; unlike `XIdleInteruptionChecker` and `WaylandInterruptionChecker`, it does not require a configured `users` list or `min_idle` setting.
+
+Set `stay_awake` to the minimum number of idle minutes required before the server may suspend. If any monitored user has been idle for less than this threshold, the checker keeps the server awake for the remaining time. The optional `ignore` value is a regular expression matched against usernames, useful for excluding greeter or service accounts. The common optional `ignore_periods` setting also applies.
+
+```json
+        "GnomeMutterIdleInterruptionChecker": {
+            "enable": true,
+            "stay_awake": 20,
+            "ignore": "\\b(?:gdm-greeter|example)\\b"
+        }
+```
+
+The checker requires GNOME Mutter to expose its idle monitor for the graphical sessions, as well as `loginctl`, `gdbus`, and `runuser`. If this checker is enabled and fails, the service logs a warning; as with other checker errors, that failure does not prevent suspension.
+
 ### Common settings for checkers
 All checkers support the following properties:
 * ```enable``` - mandatory, you can activate (```true```) or deactivate (```false```) a checker
@@ -457,9 +495,7 @@ In case that somebody is working on a terminal, e.g. ssh terminal, you probably 
         "WhoInteruptionChecker": {         // Checker that checks if there are active terminals
             "enable": true,                // [true,false] if true then checker is activated
             "stay_awake": 10,              // If there are active terminals at this moment service will wait another 10 minutes before it retries to suspend system
-            "ignore_lines": [              // Some terminals/lines are always active, e.g. the line for the Gnome-Session. This will be ignored. Use the "w" command in order to find out the line for your system!
-                "tty7"
-            ]
+            "ignore": "\\btty7\\b"        // Regex for lines that should not count as active terminals
         },
 ```
 
@@ -480,9 +516,7 @@ In this example the Gnome shell has the line ```tty7```. To ignore this shell co
         "WhoInteruptionChecker": {
             "enable": true,
             "stay_awake": 10,
-            "ignore_lines": [
-                "tty7"
-            ]
+            "ignore": "\\btty7\\b"
         },
 ```
 

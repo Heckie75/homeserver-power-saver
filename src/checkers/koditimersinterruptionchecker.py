@@ -173,4 +173,8 @@ class KodiTimersInterruptionChecker(AbstractInterruptionChecker):
 
         pause_from, pause_to, offset, vol_default = self._get_settings(
             self._load_settings_xml())
-        self._kodiJsonRpcClient.set_volume(vol_default)
+        try:
+            if self._kodiJsonRpcClient:
+                self._kodiJsonRpcClient.set_volume(vol_default)
+        except RuntimeError as error:
+            self._log_checker_failure("set_volume", error)

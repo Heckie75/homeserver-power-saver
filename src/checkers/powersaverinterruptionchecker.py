@@ -52,11 +52,15 @@ class PowerSaverInterruptionChecker(AbstractInterruptionChecker):
 
     def _perform_subprocess(self, args: 'list[str]') -> None:
 
-        with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as p:
+        with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
 
             out, err = p.communicate()
             if out:
-                LOGGER.info(out.decode("utf-8"))
+                LOGGER.info(out.decode("utf-8", errors="replace"))
 
             if err:
-                LOGGER.error(err.decode("utf-8"))
+                LOGGER.error("%s", err.decode("utf-8", errors="replace").strip())
+
+            if p.returncode:
+                raise subprocess.CalledProcessError(
+                    p.returncode, args, output=out, stderr=err)

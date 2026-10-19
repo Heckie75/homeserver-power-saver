@@ -17,14 +17,12 @@ class PulseAudioSinkInputInterruptionChecker(AbstractInterruptionChecker):
 
         LOGGER.debug(
             "get sink inputs for user %s" % user)
-        try:
-            runuser = "runuser -u %s -- " % user if os.getuid() == 0 else ""
-            output = subprocess.getoutput(
-                "LANG=en XDG_RUNTIME_DIR=/run/user/$(id -u %s)/ %spactl -f json list sink-inputs" % (user, runuser))
-            return json.loads(output) if output else None
-        except:
-            LOGGER.error("unable to determine sink-inputs", exc_info=True)
-            return []
+        runuser = "runuser -u %s -- " % user if os.getuid() == 0 else ""
+        output = subprocess.getoutput(
+            "LANG=en XDG_RUNTIME_DIR=/run/user/$(id -u %s)/ %spactl -f json list sink-inputs" % (user, runuser))
+        if not output:
+            raise RuntimeError("pactl returned no sink-input data for user %s" % user)
+        return json.loads(output)
 
     def get_occupation(self, dt_now: datetime) -> timedelta:
 

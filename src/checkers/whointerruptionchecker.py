@@ -12,33 +12,27 @@ LOGGER = logging.getLogger()
 
 class WhoInterruptionChecker(AbstractInterruptionChecker):
 
-    def _who(self) -> 'list[tuple[str,str,str]]':
+    def _who(self) -> list[str]:
 
         LOGGER.debug("query who's logged in")
 
-        ignore_lines = self.setting["ignore_lines"] if "ignore_lines" in self.setting else list(
-        )
+        ignore = self.setting.get("ignore")
+        ignore_pattern = re.compile(ignore) if ignore is not None else None
 
-        lines = subprocess.getoutput("who").splitlines()
-        who_list = list()
+        lines = subprocess.getoutput("w -h").splitlines()
+        active_lines = []
         for line in lines:
-            m = re.match(r"^([^ ]+) +([^ ]+) +(.*)$", line)
-            if m and m.groups()[1] not in ignore_lines:
-                who_list.append(
-                    (m.groups()[0], m.groups()[1], m.groups()[2]))
+            LOGGER.debug(line)
+            if ignore_pattern is None or not ignore_pattern.search(line):
+                active_lines.append(line)
 
-        return who_list
+        return active_lines
 
     def get_occupation(self, dt_now: datetime) -> timedelta:
 
         if not platform.startswith("linux"):
             return None
 
-        who = self._who()
-        if who:
-            for w in who:
-                LOGGER.debug("user=%s, line=%s, info=%s" % w)
+        if self._who():
             return self.stay_awake
-
-        else:
-            return None
+        return None

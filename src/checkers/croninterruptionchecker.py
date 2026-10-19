@@ -35,20 +35,25 @@ class CronInterruptionChecker(AbstractInterruptionChecker):
         if not platform.startswith("linux"):
             return list()
 
+        if CronTab is None:
+            raise RuntimeError("python-crontab is not installed")
+
         crontabs = list()
         if "users" in self.setting and self.setting["users"]:
             for user in self.setting["users"]:
                 try:
                     crontabs.append(CronTab(user=user))
-                except:
-                    LOGGER.error("Error while reading crontabs for user %s. Do you have permission?" % user, exc_info=True)
+                except Exception as error:
+                    raise RuntimeError(
+                        "Error reading crontab for user %s: %s" % (user, error)) from error
 
         if "tabfiles" in self.setting and self.setting["tabfiles"]:
             for tabfile in self.setting["tabfiles"]:
                 try:
                     crontabs.append(CronTab(tabfile=tabfile))
-                except:
-                    LOGGER.error("Error while reading crontab from tabfile %s. Do you have permission?" % tabfile, exc_info=True)
+                except Exception as error:
+                    raise RuntimeError(
+                        "Error reading crontab file %s: %s" % (tabfile, error)) from error
 
         return crontabs
 
@@ -84,9 +89,9 @@ class CronInterruptionChecker(AbstractInterruptionChecker):
 
                 return ignore, force, stay_awake, extra_wakeup_time
 
-        except:
-            LOGGER.error("Can't parse annotation from comment %s" % comment, exc_info=True)
-            return ignore, force, stay_awake, extra_wakeup_time
+        except (IndexError, ValueError) as error:
+            raise ValueError(
+                "Can't parse cron annotation %r: %s" % (comment, error)) from error
 
     def _get_schedule(self, cronitem: 'CronItem', dt_now: datetime) -> 'tuple[datetime,datetime]':
 

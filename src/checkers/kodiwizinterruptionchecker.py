@@ -38,7 +38,7 @@ class KodiWizInterruptionChecker(AbstractInterruptionChecker):
                 return json.loads("\n".join(f.readlines()))
 
         except:
-            LOGGER.error("Failed to read running programs file %s" %
+            LOGGER.warning("Failed to read running programs file %s. Assume that not programs are running." %
                          _wiz_running_programs_file, exc_info=True)
             return []
 

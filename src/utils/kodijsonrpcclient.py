@@ -19,19 +19,20 @@ class KodiJsonRpcClient():
 
         try:
             response = requests.request("POST", "http://%s:%i/jsonrpc" % (
-                self._host, self._port), auth=(self._user, self._password) if self._user and self._password else None, data=json.dumps(payload))
+                self._host, self._port), auth=(self._user, self._password) if self._user and self._password else None, data=json.dumps(payload), timeout=5)
 
             if response.ok:
                 LOGGER.debug(response.text)
                 return json.loads(response.text)
 
             else:
-                LOGGER.error(
-                    "Kodi has responded with HTTP status code %i" % response.status_code)
-                return None
-        except:
-            LOGGER.error("Unexpected error", exc_info=True)
-            return None
+                raise RuntimeError(
+                    "Kodi at %s:%i responded with HTTP status code %i"
+                    % (self._host, self._port, response.status_code))
+        except requests.exceptions.RequestException as error:
+            raise RuntimeError(
+                "Kodi request to %s:%i failed: %s. Is Kodi running and reachable?"
+                % (self._host, self._port, " ".join(str(error).splitlines()))) from error
 
     def get_active_players(self) -> 'list[dict]':
 
